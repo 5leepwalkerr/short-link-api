@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: maxim277
+    url: jdbc:postgresql://localhost:5432/postgres
+
+  flyway:
+    encoding: UTF-8
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    show-sql: true
+  jooq:
+    sql-dialect: org.hibernate.dialect.PostgreSQLDialect
+server:
+  port: 8081

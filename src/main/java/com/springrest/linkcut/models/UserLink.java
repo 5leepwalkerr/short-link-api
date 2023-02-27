@@ -6,16 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Getter
 @Setter
+@Getter
 @NoArgsConstructor
-@Table(name = "link")
-public class Link {
+@Table(name = "userLink")
+public class UserLink {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String cutLink;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    User user;
+    Long user_id;
+    String username;
+    Long longLink;
 }

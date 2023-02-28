@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @RestController
 @RequestMapping("/link")
@@ -35,6 +37,14 @@ public class LinkController {
         String shortLink = linkService.createCutLink(user.getLongLink());
         user.setShort_link(shortLink);
         userLinkRepository.save(user);
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                userLinkRepository.DeleteUserById(user.getUser_id());
+            }
+        };
+        timer.schedule(task,10*60*1000);
         return shortLink;
     }
 

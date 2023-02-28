@@ -47,12 +47,11 @@ public class LinkController {
         timer.schedule(task,10*60*1000);
         return shortLink;
     }
-
     @GetMapping("/{shortLink}")
     public ResponseEntity<?> redirect(@PathVariable("shortLink") String shortLink) {
         var url = linkService.getOriginalLink(shortLink);
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(url))
-                .build(); // какие-то траблы с перенаправлением, погуглить - решить, но в целом все гуччи
+                .build();
     }
 }

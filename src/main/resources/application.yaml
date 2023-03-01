@@ -17,3 +17,8 @@ spring:
     sql-dialect: org.hibernate.dialect.PostgreSQLDialect
 server:
   port: 8081
+
+logging:
+  level:
+    org.springframework.web: error
+

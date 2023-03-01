@@ -15,6 +15,6 @@ public class UserLink {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long user_id;
     String username;
-    String short_link;
-    Long longLink;
+    String shortLink;
+    String longLink;
 }

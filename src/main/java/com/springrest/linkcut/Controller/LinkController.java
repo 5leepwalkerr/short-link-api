@@ -3,6 +3,7 @@ package com.springrest.linkcut.Controller;
 import com.springrest.linkcut.Service.LinkService;
 import com.springrest.linkcut.models.UserLink;
 import com.springrest.linkcut.models.repository.UserLinkRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+@Slf4j
 @RestController
 @RequestMapping("/link")
 public class LinkController {
@@ -35,7 +37,7 @@ public class LinkController {
     @PostMapping("/create-short-link")
     public String getShortLink(@RequestBody UserLink user) {
         String shortLink = linkService.createCutLink(user.getLongLink());
-        user.setShort_link(shortLink);
+        user.setShortLink(shortLink);
         userLinkRepository.save(user);
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
@@ -54,4 +56,5 @@ public class LinkController {
                 .location(URI.create(url))
                 .build();
     }
+    
 }

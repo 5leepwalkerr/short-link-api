@@ -12,11 +12,12 @@ import java.util.List;
 @Repository
 public interface UserLinkRepository extends JpaRepository<UserLink,Long> {
     @Transactional
-    @Query("select u from UserLink u where u.short_link like :shortLink")
+    @Query("select u from UserLink u where u.shortLink like :shortLink")
     List<UserLink>UserWithExistLink(String shortLink);
 
     @Modifying
     @Transactional
     @Query("delete from UserLink p where p.user_id=:id")
     Integer DeleteUserById(Long id);
+
 }

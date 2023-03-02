@@ -56,5 +56,5 @@ public class LinkController {
                 .location(URI.create(url))
                 .build();
     }
-    
+
 }

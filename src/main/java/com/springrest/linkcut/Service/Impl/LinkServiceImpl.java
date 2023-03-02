@@ -6,7 +6,8 @@ import com.springrest.linkcut.models.repository.UserLinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -20,8 +21,20 @@ public class LinkServiceImpl implements LinkService {
     @Override
     public String createCutLink(String longLink) {
         var resultBuild = new StringBuilder();
-        String regex = "//d+"; // only digits 0-9
-        if(longLink.matches(regex)) {
+        Pattern patternLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)\\/))([^\\?&\\\"'<> #].+)");
+        Matcher matcherLink = patternLink.matcher(longLink);
+        Pattern domainPattern = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)))");
+        Matcher matcherDomain = domainPattern.matcher(longLink);
+
+        String videoCode = "";
+        String domain = "";
+
+        if(matcherLink.find()) videoCode = matcherLink.group(1);
+        if(matcherDomain.find()) domain = matcherDomain.group(0);
+        resultBuild.append(domain);
+
+        String regexOnlyNums = "//d+"; // only digits 0-9
+        if(videoCode.matches(regexOnlyNums)) {
             Long intLongLink = Long.parseLong(longLink);
             while (intLongLink > 0) {
                 String line = String.valueOf(intLongLink % alphabetLen);
@@ -33,14 +46,14 @@ public class LinkServiceImpl implements LinkService {
             }
         }
         else{
-            char[] arrOfLongLink = longLink.toCharArray();
+            char[] arrOfLongLink = videoCode.toCharArray();
             for(int i=0;i<arrOfLongLink.length-1;i++){
                int charPosition = Character.getNumericValue(arrOfLongLink[i]);
                if(charPosition<=alphabetLen && charPosition>0) {
                    char code = base62[charPosition];
                    resultBuild.append(code);
                }
-               if(resultBuild.length()>9)break;
+               if(resultBuild.length()-domain.length() >9)break;
             }
         }
         return resultBuild.toString();

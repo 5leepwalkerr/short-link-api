@@ -14,57 +14,60 @@ import java.util.regex.Pattern;
 public class LinkServiceImpl implements LinkService {
     @Autowired
     private UserLinkRepository userLinkRepository;
-    private static final String allowedString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private static final char[] base62 = allowedString.toCharArray();
-    private final int alphabetLen = base62.length;
+
+    private static final String ALLOWED_SYMBOLS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final char[] BASE_62 = ALLOWED_SYMBOLS.toCharArray();
+    private final int SYMBOLS_LENGTH = BASE_62.length;
 
     @Override
     public String createCutLink(String longLink) {
         var resultBuild = new StringBuilder();
-        Pattern patternLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)\\/))([^\\?&\\\"'<> #].+)");
-        Matcher matcherLink = patternLink.matcher(longLink);
-        Pattern domainPattern = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)))");
-        Matcher matcherDomain = domainPattern.matcher(longLink);
-
-        String videoCode = "";
-        String domain = "";
-
-        if(matcherLink.find()) videoCode = matcherLink.group(1);
-        if(matcherDomain.find()) domain = matcherDomain.group(0);
-        resultBuild.append(domain);
-
-        String regexOnlyNums = "//d+"; // only digits 0-9
-        if(videoCode.matches(regexOnlyNums)) {
+        Pattern regexLongLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)\\/))([^\\?&\\\"'<> #].+)"); // regex for body
+        Matcher matcherRegex = regexLongLink.matcher(longLink);
+        
+        String bodyLink = "";
+        String domainLink = "";
+        
+        if(matcherRegex.find()) {
+            bodyLink = matcherRegex.group(1);
+        }
+        regexLongLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)))"); // regex for domainLink 
+        matcherRegex = regexLongLink.matcher(longLink);
+        if(matcherRegex.find()) {
+            domainLink = matcherRegex.group(0);
+        }
+        
+        String onlyDigitsRegex = "//d+"; // only digits 0-9
+        if(bodyLink.matches(onlyDigitsRegex)) { // if link contains only digits in body
             Long intLongLink = Long.parseLong(longLink);
-            while (intLongLink > 0) {
-                String line = String.valueOf(intLongLink % alphabetLen);
-                if (Long.valueOf(line) <= alphabetLen) {
-                    resultBuild.append(base62[Integer.valueOf(line)]);
-                    intLongLink /= alphabetLen;
+            resultBuild.append(domainLink); // append domain link before adding body of link
+            while (intLongLink > 0) { // transfer from base62 to decimal
+                String line = String.valueOf(intLongLink % SYMBOLS_LENGTH);
+                if (Long.valueOf(line) <= SYMBOLS_LENGTH) {
+                    resultBuild.append(BASE_62[Integer.valueOf(line)]);
+                    intLongLink /= SYMBOLS_LENGTH;
                 }
                 if (resultBuild.length() > 9) break;
             }
         }
         else{
-            char[] arrOfLongLink = videoCode.toCharArray();
+            char[] arrOfLongLink = bodyLink.toCharArray();
+            resultBuild.append(domainLink); // append domain link before adding body of link
             for(int i=0;i<arrOfLongLink.length-1;i++){
-               int charPosition = Character.getNumericValue(arrOfLongLink[i]);
-               if(charPosition<=alphabetLen && charPosition>0) {
-                   char code = base62[charPosition];
+               int charPosition = Character.getNumericValue(arrOfLongLink[i]); // char position in ASCII
+               if(charPosition<=SYMBOLS_LENGTH && charPosition>0) {
+                   char code = BASE_62[charPosition]; //  encrypt chars by position in allowed symbols array
                    resultBuild.append(code);
                }
-               if(resultBuild.length()-domain.length() >9)break;
+               if(resultBuild.length()-domainLink.length() >9) break; // length of 9 chars gives 72 million variations
             }
         }
         return resultBuild.toString();
     }
     @Override
     public String getOriginalLink(String shortLink) {
-        List<UserLink> users = userLinkRepository.UserWithExistLink(shortLink);
-        for (UserLink u : users) {
-            if (!users.isEmpty() && users.size() == 1) return u.getLongLink().toString();
-            else return "Nothing to return, no exist links";
-        }
-        return null;
+        UserLink user  = userLinkRepository.UserWithExistLink(shortLink); // takes user with input short link
+        if(user.getShortLink()!=null) return user.getLongLink(); // returns user if he had input short link
+        else return "Nothing to return, no exists links";
     }
 }

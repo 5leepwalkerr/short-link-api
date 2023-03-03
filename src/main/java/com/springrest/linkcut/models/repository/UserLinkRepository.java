@@ -12,8 +12,8 @@ import java.util.List;
 @Repository
 public interface UserLinkRepository extends JpaRepository<UserLink,Long> {
     @Transactional
-    @Query("select u from UserLink u where u.shortLink like :shortLink")
-    List<UserLink>UserWithExistLink(String shortLink);
+    @Query("select u from UserLink u where u.shortLink=:shortLink")
+    UserLink UserWithExistLink(String shortLink);
 
     @Modifying
     @Transactional

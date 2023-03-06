@@ -13,12 +13,14 @@ spring:
       ddl-auto: update
     database: postgresql
     show-sql: true
+    open-in-view: true
   jooq:
     sql-dialect: org.hibernate.dialect.PostgreSQLDialect
 server:
-  port: 8081
+  port: 8080
 
 logging:
   level:
     org.springframework.web: error
+    org.springframework.data: debug
 

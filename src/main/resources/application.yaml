@@ -17,7 +17,7 @@ spring:
   jooq:
     sql-dialect: org.hibernate.dialect.PostgreSQLDialect
 server:
-  port: 8081
+  port: 8080
 
 logging:
   level:

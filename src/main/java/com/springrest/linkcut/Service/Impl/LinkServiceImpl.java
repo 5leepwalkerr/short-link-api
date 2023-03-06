@@ -6,6 +6,7 @@ import com.springrest.linkcut.models.repository.UserLinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,7 +68,14 @@ public class LinkServiceImpl implements LinkService {
     @Override
     public String getOriginalLink(String shortLink) {
         UserLink user  = userLinkRepository.UserWithExistLink(shortLink); // takes user with input short link
-        if(user.getShortLink()!=null) return user.getLongLink(); // returns user if he had input short link
-        else return "Nothing to return, no exists links";
+        for(int i=0;i<10;i++) {
+            if (user.getShortLink() != null) {
+                return user.getLongLink(); // returns user if he had input short link
+            } else {
+                return "Nothing to return, no exists links";
+            }
+        }
+        return null;
+
     }
 }

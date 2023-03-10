@@ -14,8 +14,8 @@ import java.util.regex.Pattern;
 public class LinkServiceImpl implements LinkService {
     @Autowired
     private UserLinkRepository userLinkRepository;
-    private static final String allowedString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private static final char[] base62 = allowedString.toCharArray();
+    private static final String ALLOWED_STRING = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final char[] base62 = ALLOWED_STRING.toCharArray();
     private final int alphabetLen = base62.length;
     private final String mineDomain = "http://localhost:8081/link/";
 

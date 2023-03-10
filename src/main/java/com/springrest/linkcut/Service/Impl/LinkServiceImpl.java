@@ -16,13 +16,32 @@ public class LinkServiceImpl implements LinkService {
     @Autowired
     private UserLinkRepository userLinkRepository;
 
+    private static final String allowedString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final char[] base62 = allowedString.toCharArray();
+    private final int alphabetLen = base62.length;
+    private final String mineDomain = "http://localhost:8081/link/";
+
+
     private static final String ALLOWED_SYMBOLS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final char[] BASE_62 = ALLOWED_SYMBOLS.toCharArray();
     private final int SYMBOLS_LENGTH = BASE_62.length;
 
+
     @Override
     public String createCutLink(String longLink) {
         var resultBuild = new StringBuilder();
+
+        Pattern patternLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)\\/))([^\\?&\\\"'<> #].+)");
+        Matcher matcherLink = patternLink.matcher(longLink);
+
+        String videoCode = "";
+        resultBuild.append(mineDomain);
+
+        if(matcherLink.find()) videoCode = matcherLink.group(1);
+
+        String regexOnlyNums = "//d+"; // only digits 0-9
+        if(videoCode.matches(regexOnlyNums)) {
+
         Pattern regexLongLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)\\/))([^\\?&\\\"'<> #].+)"); // regex for body
         Matcher matcherRegex = regexLongLink.matcher(longLink);
         
@@ -40,6 +59,7 @@ public class LinkServiceImpl implements LinkService {
         
         String onlyDigitsRegex = "//d+"; // only digits 0-9
         if(bodyLink.matches(onlyDigitsRegex)) { // if link contains only digits in body
+
             Long intLongLink = Long.parseLong(longLink);
             resultBuild.append(domainLink); // append domain link before adding body of link
             while (intLongLink > 0) { // transfer from base62 to decimal
@@ -60,13 +80,21 @@ public class LinkServiceImpl implements LinkService {
                    char code = BASE_62[charPosition]; //  encrypt chars by position in allowed symbols array
                    resultBuild.append(code);
                }
+
+               if(resultBuild.length()-mineDomain.length() >8)break;
+
                if(resultBuild.length()-domainLink.length() >9) break; // length of 9 chars gives 72 million variations
+
             }
         }
         return resultBuild.toString();
     }
     @Override
     public String getOriginalLink(String shortLink) {
+
+        UserLink user = userLinkRepository.UserWithExistLink(mineDomain+shortLink);
+            if (!user.getLongLink().isEmpty()) return user.getLongLink().toString();
+
         UserLink user  = userLinkRepository.UserWithExistLink(shortLink); // takes user with input short link
         for(int i=0;i<10;i++) {
             if (user.getShortLink() != null) {
@@ -76,6 +104,7 @@ public class LinkServiceImpl implements LinkService {
             }
         }
         return null;
+
 
     }
 }

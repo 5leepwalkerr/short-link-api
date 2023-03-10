@@ -57,11 +57,8 @@ public class LinkServiceImpl implements LinkService {
     }
     @Override
     public String getOriginalLink(String shortLink) {
-        List<UserLink> users = userLinkRepository.UserWithExistLink(mineDomain+shortLink);
-        for (UserLink u : users) {
-            if (!users.isEmpty() && users.size() == 1) return u.getLongLink().toString();
+        UserLink user = userLinkRepository.UserWithExistLink(mineDomain+shortLink);
+            if (!user.getLongLink().isEmpty()) return user.getLongLink().toString();
             else return "Nothing to return, no exist links";
-        }
-        return null;
     }
 }

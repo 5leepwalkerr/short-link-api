@@ -13,7 +13,7 @@ import java.util.List;
 public interface UserLinkRepository extends JpaRepository<UserLink,Long> {
     @Transactional
     @Query("select u from UserLink u where u.shortLink like :shortLink")
-    List<UserLink>UserWithExistLink(String shortLink);
+    UserLink UserWithExistLink(String shortLink);
 
     @Modifying
     @Transactional

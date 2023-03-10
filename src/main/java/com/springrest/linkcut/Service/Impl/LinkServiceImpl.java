@@ -19,6 +19,7 @@ public class LinkServiceImpl implements LinkService {
     private static final String ALLOWED_SYMBOLS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final char[] BASE_62 = ALLOWED_SYMBOLS.toCharArray();
     private final int SYMBOLS_LENGTH = BASE_62.length;
+    private final String SITE_DOMAIN = "http://localhost:8080/link/";
 
     @Override
     public String createCutLink(String longLink) {
@@ -27,21 +28,16 @@ public class LinkServiceImpl implements LinkService {
         Matcher matcherRegex = regexLongLink.matcher(longLink);
         
         String bodyLink = "";
-        String domainLink = "";
+
         
         if(matcherRegex.find()) {
             bodyLink = matcherRegex.group(1);
         }
-        regexLongLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)))"); // regex for domainLink 
-        matcherRegex = regexLongLink.matcher(longLink);
-        if(matcherRegex.find()) {
-            domainLink = matcherRegex.group(0);
-        }
-        
+        resultBuild.append(SITE_DOMAIN); // append domain link before adding body of link
+
         String onlyDigitsRegex = "//d+"; // only digits 0-9
         if(bodyLink.matches(onlyDigitsRegex)) { // if link contains only digits in body
             Long intLongLink = Long.parseLong(longLink);
-            resultBuild.append(domainLink); // append domain link before adding body of link
             while (intLongLink > 0) { // transfer from base62 to decimal
                 String line = String.valueOf(intLongLink % SYMBOLS_LENGTH);
                 if (Long.valueOf(line) <= SYMBOLS_LENGTH) {
@@ -53,29 +49,21 @@ public class LinkServiceImpl implements LinkService {
         }
         else{
             char[] arrOfLongLink = bodyLink.toCharArray();
-            resultBuild.append(domainLink); // append domain link before adding body of link
             for(int i=0;i<arrOfLongLink.length-1;i++){
                int charPosition = Character.getNumericValue(arrOfLongLink[i]); // char position in ASCII
                if(charPosition<=SYMBOLS_LENGTH && charPosition>0) {
                    char code = BASE_62[charPosition]; //  encrypt chars by position in allowed symbols array
                    resultBuild.append(code);
                }
-               if(resultBuild.length()-domainLink.length() >9) break; // length of 9 chars gives 72 million variations
+               if(resultBuild.length()-SITE_DOMAIN.length() >8) break; // length of 9 chars gives 72 million variations
             }
         }
         return resultBuild.toString();
     }
     @Override
     public String getOriginalLink(String shortLink) {
-        UserLink user  = userLinkRepository.UserWithExistLink(shortLink); // takes user with input short link
-        for(int i=0;i<10;i++) {
-            if (user.getShortLink() != null) {
-                return user.getLongLink(); // returns user if he had input short link
-            } else {
-                return "Nothing to return, no exists links";
-            }
-        }
-        return null;
-
+        UserLink user = userLinkRepository.UserWithExistLink(SITE_DOMAIN+shortLink);
+        if(!user.getLongLink().isEmpty()) return user.getLongLink().toString();
+        else return "Nothing to return, no exist link";
     }
 }

@@ -39,14 +39,6 @@ public class LinkController {
         String shortLink = linkService.createCutLink(user.getLongLink());
         user.setShortLink(shortLink);
         userLinkRepository.save(user);
-        Timer timer = new Timer();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                userLinkRepository.DeleteUserById(user.getUser_id());
-            }
-        };
-        timer.schedule(task,10*60*1000);
         return shortLink;
     }
     @GetMapping("/{shortLink}")

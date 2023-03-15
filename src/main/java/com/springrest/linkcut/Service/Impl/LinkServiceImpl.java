@@ -14,46 +14,43 @@ import java.util.regex.Pattern;
 public class LinkServiceImpl implements LinkService {
     @Autowired
     private UserLinkRepository userLinkRepository;
-    private static final String allowedString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private static final char[] base62 = allowedString.toCharArray();
-    private final int alphabetLen = base62.length;
+    private static final String ALLOWED_STRING = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_+=";
+    private static final char[] BASE_66 = ALLOWED_STRING.toCharArray();
+    private final int ALPHABET_LENGTH = BASE_66.length;
+    private final String SITE_DOMAIN = "http://localhost:8080/link/";
 
     @Override
     public String createCutLink(String longLink) {
         var resultBuild = new StringBuilder();
-        Pattern patternLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)\\/))([^\\?&\\\"'<> #].+)");
+        Pattern patternLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)\\/))([^\\?&\\\"'<> #].+)"); // regex for link body
         Matcher matcherLink = patternLink.matcher(longLink);
-        Pattern domainPattern = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)))");
-        Matcher matcherDomain = domainPattern.matcher(longLink);
 
-        String videoCode = "";
-        String domain = "";
+        String linkBody = "";
+        resultBuild.append(SITE_DOMAIN);
 
-        if(matcherLink.find()) videoCode = matcherLink.group(1);
-        if(matcherDomain.find()) domain = matcherDomain.group(0);
-        resultBuild.append(domain);
+        if(matcherLink.find()) linkBody = matcherLink.group(1);
 
-        String regexOnlyNums = "//d+"; // only digits 0-9
-        if(videoCode.matches(regexOnlyNums)) {
+        String onlyDigits = "//d+"; // only digits 0-9
+        if(linkBody.matches(onlyDigits)) {
             Long intLongLink = Long.parseLong(longLink);
             while (intLongLink > 0) {
-                String line = String.valueOf(intLongLink % alphabetLen);
-                if (Long.valueOf(line) <= alphabetLen) {
-                    resultBuild.append(base62[Integer.valueOf(line)]);
-                    intLongLink /= alphabetLen;
+                String line = String.valueOf(intLongLink % ALPHABET_LENGTH);
+                if (Long.valueOf(line) <= ALPHABET_LENGTH) {
+                    resultBuild.append(BASE_66[Integer.valueOf(line)]);
+                    intLongLink /= ALPHABET_LENGTH;
                 }
                 if (resultBuild.length() > 9) break;
             }
         }
         else{
-            char[] arrOfLongLink = videoCode.toCharArray();
+            char[] arrOfLongLink = linkBody.toCharArray();
             for(int i=0;i<arrOfLongLink.length-1;i++){
                int charPosition = Character.getNumericValue(arrOfLongLink[i]);
-               if(charPosition<=alphabetLen && charPosition>0) {
-                   char code = base62[charPosition];
+               if(charPosition<=ALPHABET_LENGTH && charPosition>0) {
+                   char code = BASE_66[charPosition];
                    resultBuild.append(code);
                }
-               if(resultBuild.length()-domain.length() >9)break;
+               if(resultBuild.length() - SITE_DOMAIN.length() >9)break;
             }
         }
         return resultBuild.toString();

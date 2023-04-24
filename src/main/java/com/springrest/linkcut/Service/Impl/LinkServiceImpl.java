@@ -4,8 +4,9 @@ import com.springrest.linkcut.Service.LinkService;
 import com.springrest.linkcut.models.UserLink;
 import com.springrest.linkcut.models.repository.UserLinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import java.util.List;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,15 +15,18 @@ import java.util.regex.Pattern;
 public class LinkServiceImpl implements LinkService {
     @Autowired
     private UserLinkRepository userLinkRepository;
+
+
     private static final String ALLOWED_STRING = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_+=";
     private static final char[] BASE_66 = ALLOWED_STRING.toCharArray();
     private final int ALPHABET_LENGTH = BASE_66.length;
-    private final String SITE_DOMAIN = "http://localhost:8080/link/";
+    private final String SITE_DOMAIN = "http://localhost:8083/link/";
 
     @Override
     public String createCutLink(String longLink) {
         var resultBuild = new StringBuilder();
-        Pattern patternLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)\\/))([^\\?&\\\"'<> #].+)"); // regex for link body
+        Pattern patternLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/" +
+                "(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)\\/))([^\\?&\\\"'<> #].+)"); // regex for link body
         Matcher matcherLink = patternLink.matcher(longLink);
 
         String linkBody = "";
@@ -30,8 +34,8 @@ public class LinkServiceImpl implements LinkService {
 
         if(matcherLink.find()) linkBody = matcherLink.group(1);
 
-        String onlyDigits = "//d+"; // only digits 0-9
-        if(linkBody.matches(onlyDigits)) {
+        String onlyDigits = "^[0-9]+$"; // only digits 0-9
+        if(longLink.matches(onlyDigits)) {
             Long intLongLink = Long.parseLong(longLink);
             while (intLongLink > 0) {
                 String line = String.valueOf(intLongLink % ALPHABET_LENGTH);
@@ -39,7 +43,7 @@ public class LinkServiceImpl implements LinkService {
                     resultBuild.append(BASE_66[Integer.valueOf(line)]);
                     intLongLink /= ALPHABET_LENGTH;
                 }
-                if (resultBuild.length() > 9) break;
+                if (resultBuild.length() - SITE_DOMAIN.length() > 9) break;
             }
         }
         else{

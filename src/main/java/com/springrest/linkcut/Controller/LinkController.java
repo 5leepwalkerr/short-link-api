@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -35,7 +36,7 @@ public class LinkController {
 
     @GetMapping("/user-{id}")
     public ResponseEntity<?> getUserById(@PathVariable(name = "id") Long id) {
-        LOGGER.info("Received GET request '/user'-{}",id);
+        LOGGER.info("Received GET request '/user-{}'",id);
         return new ResponseEntity<>(userLinkRepository.findById(id), HttpStatus.FOUND);
     }
 
@@ -50,7 +51,7 @@ public class LinkController {
     @GetMapping("/{shortLink}")
     public ResponseEntity<?> redirect(@PathVariable("shortLink") String shortLink) {
         var url = linkService.getOriginalLink(shortLink);
-        LOGGER.info("Received GET request "+"/"+shortLink);
+        LOGGER.info("Received GET request "+ "/" +shortLink);
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(url))
                 .build();

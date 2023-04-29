@@ -5,6 +5,8 @@ import com.springrest.linkcut.models.UserLink;
 import com.springrest.linkcut.models.repository.UserLinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Matcher;
@@ -24,6 +26,7 @@ public class LinkServiceImpl implements LinkService {
 
     @Override
     public String createCutLink(String longLink) {
+        // проверку на уже созданный линк
         var resultBuild = new StringBuilder();
         Pattern patternLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/" +
                 "(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)\\/))([^\\?&\\\"'<> #].+)"); // regex for link body

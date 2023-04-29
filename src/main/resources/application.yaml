@@ -8,6 +8,7 @@ spring:
   flyway:
     encoding: UTF-8
 
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -16,6 +17,13 @@ spring:
     open-in-view: true
   jooq:
     sql-dialect: org.hibernate.dialect.PostgreSQLDialect
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
+  cache:
+    type: redis
 server:
   port: 8083
 

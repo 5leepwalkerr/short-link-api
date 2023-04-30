@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +15,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/link")
-public class LinkController {
+public class LinkController{
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkController.class);
     @Autowired
     private UserLinkRepository userLinkRepository;
@@ -35,6 +37,7 @@ public class LinkController {
     }
 
     @GetMapping("/user-{id}")
+    @Cacheable(cacheNames = "links")
     public ResponseEntity<?> getUserById(@PathVariable(name = "id") Long id) {
         LOGGER.info("Received GET request '/user-{}'",id);
         return new ResponseEntity<>(userLinkRepository.findById(id), HttpStatus.FOUND);
@@ -49,6 +52,7 @@ public class LinkController {
         return new ResponseEntity<>(shortLink,HttpStatus.CREATED);
     }
     @GetMapping("/{shortLink}")
+    @Cacheable(cacheNames = "links")
     public ResponseEntity<?> redirect(@PathVariable("shortLink") String shortLink) {
         var url = linkService.getOriginalLink(shortLink);
         LOGGER.info("Received GET request "+ "/" +shortLink);

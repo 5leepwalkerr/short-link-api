@@ -6,6 +6,9 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -16,17 +19,20 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
+import javax.swing.*;
 import java.time.Duration;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@ComponentScan
+@EnableCaching
 public class RedisConfiguration {
 
     @Value("${spring.data.redis.host}")
     String host;
     @Value("${spring.data.redis.port}")
     Integer port;
+    @Value("${spring.data.redis.password}")
+    String password;
 
     @Bean
     public RedisCacheConfiguration cacheConfiguration(){
@@ -40,6 +46,7 @@ public class RedisConfiguration {
     @Bean
     JedisConnectionFactory jedisConnectionFactory(){
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(host,port);
+        redisStandaloneConfiguration.setPassword(password);
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
 
@@ -55,9 +62,7 @@ public class RedisConfiguration {
         return (builder) -> builder
                 .withCacheConfiguration("linkCache",
                         RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(10)))
-                .withCacheConfiguration("customerCache",
+                .withCacheConfiguration("links",
                         RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(5)));
     }
-
-
 }

@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface UserLinkRepository extends JpaRepository<UserLink,Long> {
     @Transactional
-    @Query("select u from UserLink u where u.shortLink like :shortLink")
+    @Query("select u from UserLink u where u.shortLink=:shortLink")
     UserLink UserWithExistLink(String shortLink);
 
     @Modifying

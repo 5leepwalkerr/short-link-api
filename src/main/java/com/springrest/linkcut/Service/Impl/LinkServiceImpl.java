@@ -5,8 +5,11 @@ import com.springrest.linkcut.models.UserLink;
 import com.springrest.linkcut.models.repository.UserLinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Matcher;
@@ -14,9 +17,12 @@ import java.util.regex.Pattern;
 
 
 @Service
+@CacheConfig(cacheNames = "linkCache")
 public class LinkServiceImpl implements LinkService {
     @Autowired
     private UserLinkRepository userLinkRepository;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
 
     private static final String ALLOWED_STRING = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_+=";
@@ -28,12 +34,12 @@ public class LinkServiceImpl implements LinkService {
     public String createCutLink(String longLink) {
         // проверку на уже созданный линк
         var resultBuild = new StringBuilder();
+        resultBuild.append(SITE_DOMAIN);
         Pattern patternLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/" +
                 "(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)\\/))([^\\?&\\\"'<> #].+)"); // regex for link body
         Matcher matcherLink = patternLink.matcher(longLink);
 
         String linkBody = "";
-        resultBuild.append(SITE_DOMAIN);
 
         if(matcherLink.find()) linkBody = matcherLink.group(1);
 
@@ -63,9 +69,11 @@ public class LinkServiceImpl implements LinkService {
         return resultBuild.toString();
     }
     @Override
-    public String getOriginalLink(String shortLink) {
+    public String getOriginalLink(String shortLink) throws NullPointerException {
         UserLink user = userLinkRepository.UserWithExistLink(shortLink);
-        if(!user.getLongLink().isEmpty()) return user.getLongLink().toString();
+        if (!user.getLongLink().isEmpty()) {
+            return user.getLongLink().toString();
+        }
         else return "Nothing to return, no exist links";
     }
 }

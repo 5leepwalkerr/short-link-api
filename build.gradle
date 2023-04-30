@@ -25,10 +25,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web-services'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.7.1'
     implementation 'org.springframework.boot:spring-boot-devtools:3.0.2'
-    implementation ('org.springframework.data:spring-data-redis:3.0.0'){
+    implementation ('org.springframework.data:spring-data-redis:3.0.2'){
         exclude group: 'io.lettuce'
     }
-    implementation 'org.springframework.boot:spring-boot-starter-cache:3.0.0'
+    implementation 'org.springframework.boot:spring-boot-starter-cache:3.0.4'
 
     implementation 'redis.clients:jedis:4.2.0'
 

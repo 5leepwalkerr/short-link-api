@@ -12,6 +12,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,7 +24,6 @@ public class LinkServiceImpl implements LinkService {
     private UserLinkRepository userLinkRepository;
     @Autowired
     private RedisTemplate redisTemplate;
-
 
     private static final String ALLOWED_STRING = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_+=";
     private static final char[] BASE_66 = ALLOWED_STRING.toCharArray();

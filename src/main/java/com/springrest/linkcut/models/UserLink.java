@@ -5,12 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Entity
 @Setter
 @Getter
 @NoArgsConstructor
 @Table(name = "userLink")
-public class UserLink {
+public class UserLink implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long user_id;

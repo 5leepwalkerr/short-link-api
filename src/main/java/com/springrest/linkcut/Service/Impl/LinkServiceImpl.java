@@ -32,7 +32,6 @@ public class LinkServiceImpl implements LinkService {
 
     @Override
     public String createCutLink(String longLink) {
-        // проверку на уже созданный линк
         var resultBuild = new StringBuilder();
         resultBuild.append(SITE_DOMAIN);
         Pattern patternLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/" +

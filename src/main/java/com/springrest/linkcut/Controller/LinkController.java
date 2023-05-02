@@ -48,10 +48,10 @@ public class LinkController implements Serializable {
     }
 
     @PostMapping("/create-short-link")
-    @Cacheable(cacheNames = "shortLinks")
+    @Cacheable(cacheNames = "shortLinks", key = "#user.username")
     public String getShortLink(@RequestBody UserLink user) {
         String shortLink = linkService.createCutLink(user.getLongLink());
-        user.setShortLink(String.valueOf(shortLink));
+        user.setShortLink(shortLink);
         userLinkRepository.save(user);
         LOGGER.info("Received POST request '/create-short-link'");
         return shortLink;

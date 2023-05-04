@@ -1,6 +1,7 @@
-package com.springrest.linkcut.Service.Impl;
+package com.springrest.linkcut.service.impl;
 
-import com.springrest.linkcut.Service.LinkService;
+import com.springrest.linkcut.exception.NotFoundLinkException;
+import com.springrest.linkcut.service.LinkService;
 import com.springrest.linkcut.models.Link;
 import com.springrest.linkcut.models.repository.LinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +27,12 @@ public class LinkServiceImpl implements LinkService {
     public String createCutLink(String longLink) {
         var resultBuild = new StringBuilder();
         resultBuild.append(SITE_DOMAIN);
-        var patternLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/" +
-                "(?:(?:watch)?\\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)\\/))([^\\?&\\\"'<> #].+)"); // regex for link body
+        var patternLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?([^\\?&\\\"'<> #].+)"); // regex for link body
         Matcher matcherLink = patternLink.matcher(longLink);
 
         String linkBody = "";
 
-        if(matcherLink.find()) linkBody = matcherLink.group(1);
+        if(matcherLink.find()) linkBody = matcherLink.group(0);
 
         String onlyDigits = "^[0-9]+$"; // only digits 0-9
         if(longLink.matches(onlyDigits)) {
@@ -47,21 +47,24 @@ public class LinkServiceImpl implements LinkService {
             }
         }
         else{
-            char[] arrOfLongLink = linkBody.toCharArray();
+            char[] arrOfLongLink =  longLink.toCharArray();
             for(int i=0;i<arrOfLongLink.length-1;i++){
                int charPosition = Character.getNumericValue(arrOfLongLink[i]);
                if(charPosition<=ALPHABET_LENGTH && charPosition>0) {
                    char code = BASE_66[charPosition];
                    resultBuild.append(code);
                }
-               if(resultBuild.length() - SITE_DOMAIN.length() >9)break;
+               if(resultBuild.length() - SITE_DOMAIN.length() >9) break;
             }
         }
         return resultBuild.toString();
     }
     @Override
-    public String getOriginalLink(String shortLink) throws NullPointerException {
-        Link user = linkRepository.UserWithExistLink(shortLink);
+    public String getOriginalLink(String shortLink){
+        if(linkRepository.existLink(shortLink)==null){
+            throw new NotFoundLinkException("There is no such link or it has been deleted, try create another one!");
+        }
+        Link user = linkRepository.existLink(shortLink);
         if (!user.getLongLink().isEmpty()) {
             return user.getLongLink().toString();
         }

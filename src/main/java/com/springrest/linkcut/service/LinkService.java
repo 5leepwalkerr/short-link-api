@@ -1,4 +1,4 @@
-package com.springrest.linkcut.Service;
+package com.springrest.linkcut.service;
 
 public interface LinkService {
     String createCutLink(String longLink);

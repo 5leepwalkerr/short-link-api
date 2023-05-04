@@ -1,6 +1,4 @@
-package com.springrest.linkcut.Exception;
-
-import jakarta.persistence.criteria.CriteriaBuilder;
+package com.springrest.linkcut.exception;
 
 public class InvalidRequestException extends RuntimeException{
     public InvalidRequestException(String s){

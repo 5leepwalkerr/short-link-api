@@ -11,14 +11,14 @@ import org.springframework.stereotype.Repository;
 public interface LinkRepository extends JpaRepository<Link,Long>{
     @Transactional
     @Query("select u from Link u where u.shortLink=:shortLink")
-    Link UserWithExistLink(String shortLink);
+    Link existLink(String shortLink);
 
     @Modifying
     @Transactional
-    @Query("delete from Link p where p.link_id=:id")
+    @Query("delete from Link p where p.linkId=:id")
     Long DeleteUserById(Long id);
 
     @Transactional
-    @Query("select l.longLink from Link l where l.link_id=:id")
+    @Query("select l.longLink from Link l where l.linkId=:id")
     String getLongLinkById(Long id);
 }

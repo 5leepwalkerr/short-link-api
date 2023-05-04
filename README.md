@@ -1,4 +1,4 @@
-# short-link-api
+# short-link-api  <img src="https://media.giphy.com/media/h0Cq1ClzO3UpupFPjP/giphy.gif" width="90">
 
 This API provides an easy and secure way to shorten URLs.
 

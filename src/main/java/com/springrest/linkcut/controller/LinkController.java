@@ -42,7 +42,7 @@ public class LinkController implements Serializable {
     }
 
     @GetMapping("/user/{id}")
-    @Cacheable(cacheNames = "userById")
+    @Cacheable(cacheNames = "getUserById")
     public Optional<Link> getUserById(@PathVariable(name = "id") Long id) {
         LOGGER.info("Received GET request '/user-{}'",id);
         Optional<Link> link = linkRepository.findById(id);
@@ -50,7 +50,7 @@ public class LinkController implements Serializable {
     }
 
     @PostMapping("/create-short-link")
-    @Cacheable(cacheNames = "shortLinks", key = "#user.longLink")
+    @Cacheable(cacheNames = "longLinks", key = "#user.longLink")
     public String getShortLink(@RequestBody Link user) {
         if(user.getLongLink()==""){
             throw new InvalidRequestException("LongLink must not be null!");

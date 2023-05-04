@@ -27,12 +27,6 @@ public class LinkServiceImpl implements LinkService {
     public String createCutLink(String longLink) {
         var resultBuild = new StringBuilder();
         resultBuild.append(SITE_DOMAIN);
-        var patternLink = Pattern.compile("(?:http(?:s)?:\\/\\/)?([^\\?&\\\"'<> #].+)"); // regex for link body
-        Matcher matcherLink = patternLink.matcher(longLink);
-
-        String linkBody = "";
-
-        if(matcherLink.find()) linkBody = matcherLink.group(0);
 
         String onlyDigits = "^[0-9]+$"; // only digits 0-9
         if(longLink.matches(onlyDigits)) {

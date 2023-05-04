@@ -17,7 +17,6 @@ To generate a short link from a long link, make a POST request to the API endpoi
 
 - API key
 - Long URL
-- Username
 
 The API will return short URL.
 

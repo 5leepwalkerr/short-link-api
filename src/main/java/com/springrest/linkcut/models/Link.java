@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
@@ -11,12 +12,14 @@ import java.io.Serializable;
 @Setter
 @Getter
 @NoArgsConstructor
-@Table(name = "userLink")
-public class UserLink implements Serializable {
+@Table(name = "link")
+public class Link implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long user_id;
-    String username;
+    Long linkId;
+
+    @NotNull
     String shortLink;
+    @NotNull
     String longLink;
 }

@@ -1,10 +1,9 @@
-package com.springrest.linkcut.Controller;
+package com.springrest.linkcut.controller;
 
-import com.fasterxml.jackson.databind.ser.std.StringSerializer;
-import com.springrest.linkcut.HelperClass.CustomResponseEntity;
-import com.springrest.linkcut.Service.LinkService;
-import com.springrest.linkcut.models.UserLink;
-import com.springrest.linkcut.models.repository.UserLinkRepository;
+import com.springrest.linkcut.exception.InvalidRequestException;
+import com.springrest.linkcut.service.LinkService;
+import com.springrest.linkcut.models.Link;
+import com.springrest.linkcut.models.repository.LinkRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,42 +24,48 @@ import java.util.Optional;
 @RequestMapping("/link")
 public class LinkController implements Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkController.class);
+
     @Serial
     private static final long serialVersionUID = -7917644949275952078L;
+
     @Autowired
-    private UserLinkRepository userLinkRepository;
+    private LinkRepository linkRepository;
     @Autowired
     private LinkService linkService;
 
+
     @GetMapping("/all")
-    public CustomResponseEntity<?> allUsers() {
-        List<UserLink> allUsers = userLinkRepository.findAll();
+    public ResponseEntity<?> allUsers() {
+        List<Link> allUsers = linkRepository.findAll();
         LOGGER.info("Received GET request '/all'");
-        return new CustomResponseEntity<>(allUsers, HttpStatus.FOUND);
+        return new ResponseEntity<>(allUsers, HttpStatus.FOUND);
     }
 
     @GetMapping("/user/{id}")
     @Cacheable(cacheNames = "userById")
-    public Optional<UserLink> getUserById(@PathVariable(name = "id") Long id) {
+    public Optional<Link> getUserById(@PathVariable(name = "id") Long id) {
         LOGGER.info("Received GET request '/user-{}'",id);
-        Optional<UserLink> user = userLinkRepository.findById(id);
-       return user;
+        Optional<Link> link = linkRepository.findById(id);
+       return link;
     }
 
     @PostMapping("/create-short-link")
-    @Cacheable(cacheNames = "shortLinks", key = "#user.username")
-    public String getShortLink(@RequestBody UserLink user) {
+    @Cacheable(cacheNames = "shortLinks", key = "#user.longLink")
+    public String getShortLink(@RequestBody Link user) {
+        if(user.getLongLink()==""){
+            throw new InvalidRequestException("LongLink must not be null!");
+        }
         String shortLink = linkService.createCutLink(user.getLongLink());
         user.setShortLink(shortLink);
-        userLinkRepository.save(user);
-        LOGGER.info("Received POST request '/create-short-link'");
+        linkRepository.save(user);
+        LOGGER.info("Received POST request '/create-short-user'");
         return shortLink;
     }
     @GetMapping("/{shortLink}")
-    public CustomResponseEntity<?> redirect(@PathVariable("shortLink") String shortLink) {
+    public ResponseEntity<?> redirect(@PathVariable("shortLink") String shortLink) {
         var url = linkService.getOriginalLink(shortLink);
-        LOGGER.info("Received GET request "+ "/" +shortLink);
-        return (CustomResponseEntity<?>) ResponseEntity.status(HttpStatus.FOUND)
+        LOGGER.info("Received GET request from /{shortLink}");
+        return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(url))
                 .build();
     }

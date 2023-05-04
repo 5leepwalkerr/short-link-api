@@ -2,12 +2,12 @@
 
 This API provides an easy and secure way to shorten URLs.
 
-## Features
+## Features <img src="https://media.giphy.com/media/RtdRhc7TxBxB0YAsK6/giphy.gif" width="30">
 
 - Generate short links from long links
 - Create an API Key for secure access
 
-## Getting Started
+## Getting Started <img src="https://media.giphy.com/media/aihuG1Li9YrnXkJhpv/giphy.gif" width="30">
 
 To get started, create an API key and then start using the API.
 

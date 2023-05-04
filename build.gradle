@@ -31,6 +31,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache:3.0.4'
 
     implementation 'redis.clients:jedis:4.2.0'
+    implementation 'org.mockito:mockito-core:4.8.1'
 
     compileOnly 'org.projectlombok:lombok'
 

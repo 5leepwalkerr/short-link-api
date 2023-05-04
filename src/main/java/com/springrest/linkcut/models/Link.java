@@ -11,11 +11,11 @@ import java.io.Serializable;
 @Setter
 @Getter
 @NoArgsConstructor
-@Table(name = "userLink")
-public class UserLink implements Serializable {
+@Table(name = "link")
+public class Link implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long user_id;
+    Long link_id;
     String username;
     String shortLink;
     String longLink;

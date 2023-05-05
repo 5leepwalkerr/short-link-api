@@ -56,11 +56,11 @@ public class LinkServiceImpl implements LinkService {
     }
     @Override
     public String getOriginalLink(String shortLink){
-        if(linkRepository.existLink(shortLink)==null){
+        if(linkRepository.existLink(shortLink).isEmpty()){
             throw new NotFoundLinkException("There is no such link or it has been deleted, try create another one!");
         }
-        Optional<Link> user = linkRepository.existLink(shortLink);
-        if (user.isPresent()) {
+        Optional<String> existShortLink = linkRepository.existLink(shortLink);
+        if (existShortLink.isPresent()) {
             return linkRepository.getLongLinkById(
                     linkRepository.getLongLinkIdBundleShortLinkByLink(shortLink)
             );

@@ -12,8 +12,8 @@ import java.util.Optional;
 @Repository
 public interface LinkRepository extends JpaRepository<Link,Long>{
     @Transactional
-    @Query("select l from Link l where l.shortLink like :shortLink")
-    Optional<Link> existLink(String shortLink);
+    @Query("select l.shortLink from Link l where l.shortLink =:shortLink")
+    Optional<String> existLink(String shortLink);
 
     @Modifying
     @Transactional
@@ -25,6 +25,6 @@ public interface LinkRepository extends JpaRepository<Link,Long>{
     String getLongLinkById(Long id);
 
     @Transactional
-    @Query("select l.linkId from Link l where l.shortLink like :shortLink")
+    @Query("select l.linkId from Link l where l.shortLink =:shortLink")
     Long getLongLinkIdBundleShortLinkByLink(String shortLink);
 }

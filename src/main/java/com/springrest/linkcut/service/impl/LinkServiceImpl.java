@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,13 +41,14 @@ public class LinkServiceImpl implements LinkService {
                 if (resultBuild.length() - SITE_DOMAIN.length() > 9) break;
             }
         }
+        //https://habr.com/ru/companies/ruvds/articles/509700/
         else{
-            char[] arrOfLongLink =  longLink.toCharArray();
-            for(int i=0;i<arrOfLongLink.length-1;i++){
+            byte[] arrOfLongLink =  longLink.getBytes(StandardCharsets.UTF_8);
+            for(int i=5;i<arrOfLongLink.length-1;i++){
                int charPosition = Character.getNumericValue(arrOfLongLink[i]);
                if(charPosition<=ALPHABET_LENGTH && charPosition>0) {
-                   char code = BASE_66[charPosition];
-                   resultBuild.append(code);
+                   char codedChar = BASE_66[charPosition];
+                   resultBuild.append(codedChar);
                }
                if(resultBuild.length() - SITE_DOMAIN.length() >9) break;
             }

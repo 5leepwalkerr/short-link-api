@@ -62,6 +62,7 @@ public class LinkController implements Serializable {
         return shortLink;
     }
     @GetMapping("/{shortLink}")
+    @Cacheable(cacheNames = "redirectLink")
     public ResponseEntity<?> redirect(@PathVariable("shortLink") String shortLink) {
         var url = linkService.getOriginalLink(shortLink);
         LOGGER.info("Received GET request from /{shortLink}");

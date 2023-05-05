@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 
 @Service
@@ -40,13 +40,14 @@ public class LinkServiceImpl implements LinkService {
                 if (resultBuild.length() - SITE_DOMAIN.length() > 9) break;
             }
         }
+        //https://habr.com/ru/companies/ruvds/articles/509700/
         else{
-            char[] arrOfLongLink =  longLink.toCharArray();
-            for(int i=0;i<arrOfLongLink.length-1;i++){
+            byte[] arrOfLongLink =  longLink.getBytes(StandardCharsets.UTF_8);
+            for(int i=5;i<arrOfLongLink.length-1;i++){
                int charPosition = Character.getNumericValue(arrOfLongLink[i]);
                if(charPosition<=ALPHABET_LENGTH && charPosition>0) {
-                   char code = BASE_66[charPosition];
-                   resultBuild.append(code);
+                   char codedChar = BASE_66[charPosition];
+                   resultBuild.append(codedChar);
                }
                if(resultBuild.length() - SITE_DOMAIN.length() >9) break;
             }
@@ -55,12 +56,14 @@ public class LinkServiceImpl implements LinkService {
     }
     @Override
     public String getOriginalLink(String shortLink){
-        if(linkRepository.existLink(shortLink)==null){
+        if(linkRepository.existLink(shortLink).isEmpty()){
             throw new NotFoundLinkException("There is no such link or it has been deleted, try create another one!");
         }
-        Link user = linkRepository.existLink(shortLink);
-        if (!user.getLongLink().isEmpty()) {
-            return user.getLongLink().toString();
+        Optional<String> existShortLink = linkRepository.existLink(shortLink);
+        if (existShortLink.isPresent()) {
+            return linkRepository.getLongLinkById(
+                    linkRepository.getLongLinkIdBundleShortLinkByLink(shortLink)
+            );
         }
         else return "Nothing to return, no exist links";
     }

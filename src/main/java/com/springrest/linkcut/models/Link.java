@@ -17,7 +17,6 @@ public class Link implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long linkId;
-
     @NotNull
     String shortLink;
     @NotNull

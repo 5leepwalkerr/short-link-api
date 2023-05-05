@@ -9,8 +9,7 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Optional;
 
 
 @Service
@@ -60,9 +59,11 @@ public class LinkServiceImpl implements LinkService {
         if(linkRepository.existLink(shortLink)==null){
             throw new NotFoundLinkException("There is no such link or it has been deleted, try create another one!");
         }
-        Link user = linkRepository.existLink(shortLink);
-        if (!user.getLongLink().isEmpty()) {
-            return user.getLongLink().toString();
+        Optional<Link> user = linkRepository.existLink(shortLink);
+        if (user.isPresent()) {
+            return linkRepository.getLongLinkById(
+                    linkRepository.getLongLinkIdBundleShortLinkByLink(shortLink)
+            );
         }
         else return "Nothing to return, no exist links";
     }

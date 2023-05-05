@@ -7,11 +7,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface LinkRepository extends JpaRepository<Link,Long>{
     @Transactional
-    @Query("select u from Link u where u.shortLink=:shortLink")
-    Link existLink(String shortLink);
+    @Query("select l from Link l where l.shortLink like :shortLink")
+    Optional<Link> existLink(String shortLink);
 
     @Modifying
     @Transactional
@@ -21,4 +23,8 @@ public interface LinkRepository extends JpaRepository<Link,Long>{
     @Transactional
     @Query("select l.longLink from Link l where l.linkId=:id")
     String getLongLinkById(Long id);
+
+    @Transactional
+    @Query("select l.linkId from Link l where l.shortLink like :shortLink")
+    Long getLongLinkIdBundleShortLinkByLink(String shortLink);
 }

@@ -13,12 +13,12 @@ import java.io.Serializable;
 @Getter
 @NoArgsConstructor
 @Table(name = "link")
-public class Link implements Serializable {
+public class Link {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long linkId;
-    @NotNull
+    @Column(name = "short_link",nullable = false)
     String shortLink;
-    @NotNull
+    @Column(name = "long_link",nullable = false)
     String longLink;
 }

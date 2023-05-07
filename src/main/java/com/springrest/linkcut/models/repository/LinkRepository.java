@@ -20,9 +20,8 @@ public interface LinkRepository extends JpaRepository<Link,Long>{
     @Query("delete from Link p where p.linkId=:id")
     Long DeleteUserById(Long id);
 
-    @Transactional
-    @Query("select l.longLink from Link l where l.linkId=:id")
-    String getLongLinkById(Long id);
+    @Query("select l.longLink from Link l where l.shortLink=:shortLink")
+    Optional<String> getLongLinkByShortLink(String shortLink);
 
     @Transactional
     @Query("select l.linkId from Link l where l.shortLink =:shortLink")

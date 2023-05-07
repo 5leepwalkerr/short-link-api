@@ -27,9 +27,8 @@ class LinkCutApplicationTests {
 
     @Test
     public void transactionTest(){
-        String testShortLink = "http://localhost:8083/link/usByFrrBEC";
-        String testLongLink = "https://kirov.hh.ru/search/vacancy?resume=1bc4cf42ff0bdc1c380039ed1f355476707955&from=resumelist&disableBrowserCache=true&page=3";
-        Assert.isTrue(testLongLink.equals(repository.getLongLinkById(
-                repository.getLongLinkIdBundleShortLinkByLink(testShortLink))),"Links aren't similar!");
+        String testShortLink = "http://localhost:8083/link/CzBsxqsyqE";
+        String testLongLink = "https://spring.io/guides/topicals/spring-boot-docker/";
+        Assert.isTrue(testLongLink.equals(repository.getLongLinkByShortLink(testShortLink).get()),"Links aren't similar!");
     }
 }

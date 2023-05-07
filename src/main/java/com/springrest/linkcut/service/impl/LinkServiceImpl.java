@@ -1,8 +1,8 @@
 package com.springrest.linkcut.service.impl;
 
 import com.springrest.linkcut.exception.NotFoundLinkException;
-import com.springrest.linkcut.service.LinkService;
 import com.springrest.linkcut.models.Link;
+import com.springrest.linkcut.service.LinkService;
 import com.springrest.linkcut.models.repository.LinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
@@ -56,15 +56,12 @@ public class LinkServiceImpl implements LinkService {
     }
     @Override
     public String getOriginalLink(String shortLink){
-        if(linkRepository.existLink(shortLink).isEmpty()){
+        Optional<String> resultLongLink =  linkRepository.getLongLinkByShortLink(SITE_DOMAIN+shortLink);
+        if(resultLongLink.isEmpty()){
             throw new NotFoundLinkException("There is no such link or it has been deleted, try create another one!");
         }
-        Optional<String> existShortLink = linkRepository.existLink(shortLink);
-        if (existShortLink.isPresent()) {
-            return linkRepository.getLongLinkById(
-                    linkRepository.getLongLinkIdBundleShortLinkByLink(shortLink)
-            );
+        else{
+            return resultLongLink.get();
         }
-        else return "Nothing to return, no exist links";
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.function.Function;
 
 
 @Service
@@ -18,7 +19,7 @@ public class LinkServiceImpl implements LinkService {
     @Autowired
     private LinkRepository linkRepository;
 
-    private static final String ALLOWED_STRING = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_+=";
+    private static final String ALLOWED_STRING = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final char[] BASE_66 = ALLOWED_STRING.toCharArray();
     private final int ALPHABET_LENGTH = BASE_66.length;
     private static final String SITE_DOMAIN = "http://localhost:8083/link/";
@@ -37,10 +38,10 @@ public class LinkServiceImpl implements LinkService {
                     resultBuild.append(BASE_66[Integer.valueOf(line)]);
                     intLongLink /= ALPHABET_LENGTH;
                 }
-                if (resultBuild.length() - SITE_DOMAIN.length() > 9) break;
+                if (resultBuild.length() - SITE_DOMAIN.length() > 10) break;
             }
         }
-        //https://habr.com/ru/companies/ruvds/articles/509700/
+        
         else{
             byte[] arrOfLongLink =  longLink.getBytes(StandardCharsets.UTF_8);
             for(int i=5;i<arrOfLongLink.length-1;i++){

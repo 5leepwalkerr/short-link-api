@@ -34,3 +34,5 @@ logging:
     org.springframework.data: debug
 
 
+site:
+  url = http://localhost:8083/link

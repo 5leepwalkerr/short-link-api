@@ -63,7 +63,7 @@ public class LinkController implements Serializable {
     }
     @GetMapping("/{shortLink}")
     public ResponseEntity<?> redirect(@PathVariable("shortLink") String shortLink) {
-        LOGGER.info("Received GET request from /{}",shortLink);
+        LOGGER.info("Received GET request from shortLink  /{}",shortLink);
         var url = linkService.getOriginalLink(shortLink);
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(url))

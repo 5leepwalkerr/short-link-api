@@ -5,6 +5,7 @@ import com.springrest.linkcut.models.Link;
 import com.springrest.linkcut.service.LinkService;
 import com.springrest.linkcut.models.repository.LinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +23,13 @@ public class LinkServiceImpl implements LinkService {
     private static final String ALLOWED_STRING = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final char[] BASE_66 = ALLOWED_STRING.toCharArray();
     private final int ALPHABET_LENGTH = BASE_66.length;
-    private static final String SITE_DOMAIN = "http://localhost:8083/link/";
+    @Value("${site:url}")
+    private String siteUrl;
 
     @Override
     public String createCutLink(String longLink) {
         var resultBuild = new StringBuilder();
-        resultBuild.append(SITE_DOMAIN);
+        resultBuild.append(siteUrl);
 
         String onlyDigits = "^[0-9]+$"; // only digits 0-9
         if(longLink.matches(onlyDigits)) {
@@ -38,7 +40,7 @@ public class LinkServiceImpl implements LinkService {
                     resultBuild.append(BASE_66[Integer.valueOf(line)]);
                     intLongLink /= ALPHABET_LENGTH;
                 }
-                if (resultBuild.length() - SITE_DOMAIN.length() > 10) break;
+                if (resultBuild.length() - siteUrl.length() > 10) break;
             }
         }
         
@@ -50,14 +52,14 @@ public class LinkServiceImpl implements LinkService {
                    char codedChar = BASE_66[charPosition];
                    resultBuild.append(codedChar);
                }
-               if(resultBuild.length() - SITE_DOMAIN.length() >9) break;
+               if(resultBuild.length() - siteUrl.length() >9) break;
             }
         }
         return resultBuild.toString();
     }
     @Override
     public String getOriginalLink(String shortLink){
-        Optional<String> resultLongLink =  linkRepository.getLongLinkByShortLink(SITE_DOMAIN+shortLink);
+        Optional<String> resultLongLink =  linkRepository.getLongLinkByShortLink(siteUrl+shortLink);
         if(resultLongLink.isEmpty()){
             throw new NotFoundLinkException("There is no such link or it has been deleted, try create another one!");
         }

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.context.annotation.Configuration;
 
 import java.io.Serializable;
 

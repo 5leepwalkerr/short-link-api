@@ -7,7 +7,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import java.io.Serializable;
 
 @SpringBootApplication
-public class LinkCutApplication implements Serializable {
+public class LinkCutApplication{
 
     public static void main(String[] args) {
         SpringApplication.run(LinkCutApplication.class, args);
